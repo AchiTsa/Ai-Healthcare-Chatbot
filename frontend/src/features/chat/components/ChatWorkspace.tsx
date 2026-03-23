@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Moon, Sun } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import InputBar from '../../../components/InputBar'
@@ -24,10 +24,20 @@ const initialMessage: ChatMessage = {
 export default function ChatWorkspace() {
   const [messages, setMessages] = useState<ChatMessage[]>([initialMessage])
   const [isLoading, setIsLoading] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isHydrated, setIsHydrated] = useState(false)
   
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark)
+    
+    setIsDarkMode(isDark)
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [])
+
 useEffect(() => {
   try {
     const stored = localStorage.getItem("conversations")
@@ -154,6 +164,13 @@ const response = await sendChatMessage({
     }
   }
 
+  const toggleTheme = () => {
+    const next = !isDarkMode
+    setIsDarkMode(next)
+    localStorage.setItem('theme', next ? 'dark' : 'light')
+    document.documentElement.classList.toggle('dark', next)
+  }
+
   return (
     <div className="relative flex min-h-screen overflow-hidden">
       <ChatHistorySidebar
@@ -165,8 +182,19 @@ const response = await sendChatMessage({
 
       <main className="relative flex min-w-0 flex-1 flex-col">
         <header className="panel-surface border-b border-slate-200/70 px-4 py-4 dark:border-slate-800/70 md:px-8">
-          <h1 className="text-xl font-semibold tracking-tight">AI Healthcare Platform</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Scalable clinical guidance with retrieval citations and triage signals</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight">AI Healthcare Platform</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-300">Scalable clinical guidance with retrieval citations and triage signals</p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white/50 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300 dark:hover:bg-slate-700"
+              aria-label="Toggle theme"
+            >
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+          </div>
         </header>
 
         <div className="border-b border-amber-300/70 bg-amber-50/90 px-4 py-2 text-sm text-amber-800 dark:border-amber-800/60 dark:bg-amber-900/30 dark:text-amber-200 md:px-8">

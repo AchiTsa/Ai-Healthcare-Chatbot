@@ -16,6 +16,15 @@
   --text-muted: #97a6c9;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --bg-main: #090f1f;
+    --bg-elev: rgba(15, 24, 44, 0.72);
+    --text-main: #e7eeff;
+    --text-muted: #97a6c9;
+  }
+}
+
 body {
   background:
     radial-gradient(1200px 480px at 8% -5%, rgba(36, 121, 255, 0.18), transparent 55%),
